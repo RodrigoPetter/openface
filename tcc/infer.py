@@ -106,7 +106,7 @@ def infer(classifierModel, imgPath, multiple=True):
     with open(classifierModel, 'r') as f:
         (le, clf) = pickle.load(f)
     
-    json = "{ result:["
+    json = '{ "result":['
 
     print("\n=== {} ===".format(imgPath))
     reps = getRep(imgPath, multiple)
@@ -130,7 +130,7 @@ def infer(classifierModel, imgPath, multiple=True):
         if isinstance(clf, GMM):
             dist = np.linalg.norm(rep - clf.means_[maxI])
             print("  + Distance from the mean: {}".format(dist))
-	json += "{"+"Prediction: '{}', confidence: {}".format(person, confidence)+"}"
+	json += "{"+'"Prediction": "{}", "confidence": {}'.format(person, confidence)+"},"
 
     json += "]}"
     return json
