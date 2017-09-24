@@ -11,7 +11,7 @@ class RequestHandler(SimpleXMLRPCRequestHandler):
 
 #Config
 porta = 8081
-endereco = "192.168.0.14"
+endereco = "192.168.0.16"
 
 # Create server
 server = SimpleXMLRPCServer((endereco, porta),
@@ -25,15 +25,26 @@ def exemplo(x,y):
 server.register_function(exemplo)
 
 def treinar():
+    raw_input("Treinamento LFW 100")
+    amostra = 100
+    gerarClassifier(amostra)    
+    with open("../treinamento_tcc/"+str(amostra)+"/feature/classifier.pkl", "rb") as f:
+        class100 = f.read().encode('base64')
 
-    #raw_input("Treinamento 1")
-    amostra = 1
-    gerarClassifier(amostra)
-    
-    with open("../treinamento_tcc/final/feature/classifier.pkl", "rb") as f:
-        class1 = f.read().encode('base64')      
+    raw_input("Treinamento LFW 500")
+    amostra = 500
+    gerarClassifier(amostra)    
+    with open("../treinamento_tcc/"+str(amostra)+"/feature/classifier.pkl", "rb") as f:
+        class500 = f.read().encode('base64')
 
-    return '{ "result":[{"nome":"Classifier1", "arquivo":"'+class1+'"}] }'
+    raw_input("Treinamento LFW 1000")
+    amostra = 1000
+    gerarClassifier(amostra)    
+    with open("../treinamento_tcc/"+str(amostra)+"/feature/classifier.pkl", "rb") as f:
+        class1000 = f.read().encode('base64')
+
+
+    return '{ "result":[{"nome":"Classifier1", "arquivo":"'+class1+'"},{"nome":"Classifier3", "arquivo":"'+class3+'"},{"nome":"Classifier6", "arquivo":"'+class6+'"},{"nome":"Classifier12", "arquivo":"'+class12+'"},{"nome":"Classifier24", "arquivo":"'+class24+'"}] }'
 server.register_function(treinar)
 
 def descobrir(treinamento64, imagem64):
@@ -57,7 +68,7 @@ def gerarClassifier(amostra):
     
     print("Iniciando treinamento: "+str(amostra)+" Foto")
     start = time.time()
-    #raw_input("alinhamento")
+    raw_input("alinhamento")
     print(datetime.datetime.now().time())
     bashCommand = "./util/align-dlib.py ./treinamento_tcc/"+str(amostra)+"/originais/ align outerEyesAndNose ./treinamento_tcc/"+str(amostra)+"/alinhadas/ --size 96"
     p = subprocess.Popen(bashCommand, shell=True, cwd=workdir)
@@ -66,7 +77,7 @@ def gerarClassifier(amostra):
     end = time.time()
     print("levou: "+str(end-start))
 
-    #raw_input("representacao")
+    raw_input("representacao")
     print(datetime.datetime.now().time())         
     start = time.time()
     bashCommand = "./batch-represent/main.lua -outDir ./treinamento_tcc/"+str(amostra)+"/feature/ -data ./treinamento_tcc/"+str(amostra)+"/alinhadas/"
@@ -76,7 +87,7 @@ def gerarClassifier(amostra):
     end = time.time()
     print("levou: "+str(end-start))
 
-    #raw_input("classificador")
+    raw_input("classificador")
     print(datetime.datetime.now().time())
     start = time.time()
     bashCommand = "./demos/classifier.py train ./treinamento_tcc/"+str(amostra)+"/feature/"
